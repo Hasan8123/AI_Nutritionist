@@ -4,7 +4,6 @@ import ImageUpload from './components/ImageUpload';
 import NutritionResults from './components/NutritionResults';
 import WebhookResults from './components/WebhookResults';
 import PreviewCarousel from './components/PreviewCarousel';
-import AuthGate from './components/AuthGate';
 import type { NutritionData, WebhookResponse } from './types';
 
 function App() {
@@ -26,7 +25,6 @@ function App() {
   };
 
   return (
-    <AuthGate>
       <div className="min-h-screen relative">
         <div className="fixed inset-0 bg-black/50 pointer-events-none" />
         <div className="relative z-10">
@@ -117,7 +115,6 @@ function App() {
         ) : null}
         </div>
       </div>
-    </AuthGate>
   );
 }
 
