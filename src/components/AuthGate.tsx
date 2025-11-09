@@ -8,6 +8,7 @@ interface AuthGateProps {
 export default function AuthGate({ children }: AuthGateProps) {
   const [loading, setLoading] = useState(true);
   const [isAuthed, setIsAuthed] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -19,20 +20,26 @@ export default function AuthGate({ children }: AuthGateProps) {
       setLoading(false);
     };
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthed(!!session);
+      if (mounted) setLoading(false);
     });
 
     init();
 
     return () => {
       mounted = false;
-      sub.subscription.unsubscribe();
+      subscription.unsubscribe();
     };
   }, []);
 
   const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({ provider: 'google' });
+    setMessage(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    });
+    if (error) setMessage(error.message);
   };
 
   const signOut = async () => {
@@ -55,6 +62,7 @@ export default function AuthGate({ children }: AuthGateProps) {
           <button onClick={signInWithGoogle} className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold">
             Continue with Google
           </button>
+          {message && <div className="mt-4 text-sm text-white/90">{message}</div>}
         </div>
       </div>
     );
